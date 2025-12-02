@@ -1,0 +1,10 @@
+# Ignored files
+message
+.message.bin
+private.pem
+public.pem
+to_be_signed
+.signature
+.signature.bin
+get-challenge-prod.sh
+.env
