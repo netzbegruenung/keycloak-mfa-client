@@ -40,3 +40,4 @@ This project contains several shell scripts for interacting with a service that 
 -   `get-challenge.sh`: This script generates a challenge request. It creates a timestamp, signs it using `sign.sh`, and sends it as a `Signature` header to the `/challenge` endpoint.
 -   `get-challenge-async.sh`: Similar to `get-challenge.sh`, but it interacts with an asynchronous version of the challenge endpoint.
 -   `put-token.sh`: This script sends a device token to the registration endpoint. It signs the request payload to authenticate the request.
+-   `reply-challenge.sh`: Fetches a challenge and then sends a signed reply to the `targetUrl` provided in the challenge. It accepts an optional boolean argument (`true` or `false`, defaults to `true`) to indicate if the login is granted.
