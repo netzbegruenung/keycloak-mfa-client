@@ -1,12 +1,23 @@
 #!/bin/bash
 
-# Set default for granted status if not provided.
-# Usage: $0 [true|false]
-GRANTED=${1:-true}
+# Defaults
+GRANTED="true"
+BASE_URL="http://localhost:8080/realms/mfa"
+
+# Argument parsing for [granted] and [base_url]
+# Usage: $0 [true|false] [base_url]
+if [[ "$1" == "true" || "$1" == "false" ]]; then
+  GRANTED=$1
+  if [ -n "$2" ]; then
+    BASE_URL=$2
+  fi
+elif [ -n "$1" ]; then
+  BASE_URL=$1
+fi
 
 # Step 1: Fetch the latest challenge
-echo "Fetching challenge..."
-CHALLENGE_RESPONSE=$(./get-challenge.sh)
+echo "Fetching challenge from ${BASE_URL}..."
+CHALLENGE_RESPONSE=$(./get-challenge.sh "${BASE_URL}")
 CHALLENGE_STATUS_CODE=$(echo "$CHALLENGE_RESPONSE" | tail -n1 | awk '{print $2}')
 
 # Check if challenge was fetched successfully
@@ -53,8 +64,10 @@ echo "Using header: $HEADER"
 
 # Step 6: Send the GET request to the targetUrl
 echo "Sending request to $TARGET_URL"
-RESPONSE=$(curl -s -H "$HEADER" "$TARGET_URL")
-STATUS_CODE=$(curl -s -o /dev/null -w "%{http_code}" -H "$HEADER" "$TARGET_URL")
+# Get response body and status code in one call
+RESPONSE_WITH_STATUS=$(curl -s -w "\\n%{http_code}" -H "$HEADER" "$TARGET_URL")
+STATUS_CODE=$(echo "$RESPONSE_WITH_STATUS" | tail -n1)
+RESPONSE=$(echo "$RESPONSE_WITH_STATUS" | sed '$d')
 
 # Pretty print JSON response
 echo "$RESPONSE" | jq .
